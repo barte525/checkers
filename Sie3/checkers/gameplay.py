@@ -1,10 +1,10 @@
 import pygame
-from checkers.constants import WIDTH, HEIGHT, SQUARE_SIZE
-from checkers.game import Game
-from checkers.GUI import GUI
+from checkers.gui_const import WIDTH, HEIGHT, SQUARE_SIZE
+from checkers.engine import Engine
+from checkers.gui import Gui
 
 
-class Play:
+class GamePlay:
     def __init__(self):
         self.FPS = 60
         self.win = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -19,12 +19,12 @@ class Play:
     def play(self):
         run = True
         clock = pygame.time.Clock()
-        game = Game()
-        gui = GUI(self.win, game.board)
+        engine = Engine()
+        gui = Gui(self.win, engine.board)
         while run:
             clock.tick(self.FPS)
-            if game.check_winner():
-                print(game.check_winner())
+            if engine.check_winner():
+                print(engine.check_winner())
                 run = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -32,6 +32,6 @@ class Play:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
                     row, col = self.get_row_col_from_mouse(pos)
-                    game.select_or_move_piece(row, col)
-            gui.update(game.valid_moves, game.board)
+                    engine.select_or_move_piece(row, col)
+            gui.update(engine.valid_moves, engine.board)
         pygame.quit()

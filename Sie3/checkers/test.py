@@ -1,7 +1,7 @@
 import pytest
 from checkers.board import Board
 from checkers.piece import Piece
-from checkers.constants import WHITE
+from checkers.gui_const import WHITE
 
 
 def test_valid_moves_start():

@@ -1,5 +1,5 @@
-from checkers.play import Play
+from checkers.gameplay import GamePlay
 
 if __name__ == '__main__':
-    play = Play()
-    play.play()
+    GamePlay = GamePlay()
+    GamePlay.play()

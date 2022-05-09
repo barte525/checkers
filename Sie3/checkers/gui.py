@@ -1,8 +1,8 @@
 import pygame
-from .constants import BLUE, SQUARE_SIZE, CROWN, GREY, ROWS, COLS, BLACK, PADDING, OUTLINE
+from .gui_const import BLUE, SQUARE_SIZE, CROWN, GREY, ROWS, COLS, BLACK, PADDING, OUTLINE
 
 
-class GUI:
+class Gui:
     def __init__(self, win, board):
         self.win = win
         self.board = board.board

@@ -1,8 +1,8 @@
-from .constants import WHITE, BROWN
+from .gui_const import WHITE, BROWN
 from checkers.board import Board
 
 
-class Game:
+class Engine:
     def __init__(self):
         self.selected = None
         self.board = Board()
@@ -17,7 +17,7 @@ class Game:
             return "BLACK WON!"
         return None
 
-    def select_or_move_piece(self, row, col):
+    def select_or_move_piece(self, row: int, col: int) -> None:
         # try to move if selected
         if self.selected:
             if not self.__move(row, col):
@@ -36,12 +36,11 @@ class Game:
         else:
             self.valid_moves = self.board.get_valid_moves(piece, possible_moves=[])
 
-    def __move(self, selected_row, selected_column):
-        piece = self.board.get_piece_from_cords(selected_row, selected_column)
-        if self.selected != 0 and piece == 0:
+    def __move(self, selected_row: int, selected_col: int) -> bool:
+        if self.selected != 0 and self.board.is_square_free(selected_row, selected_col):
             for move in self.valid_moves:
                 cords_for_selected_piece, destination_cords, jumped_pieces = move
-                if destination_cords[0] == selected_row and destination_cords[1] == selected_column:
+                if destination_cords[0] == selected_row and destination_cords[1] == selected_col:
                     if len(jumped_pieces) > 0:
                         for (jumped_piece_row, jumped_piece_column) in jumped_pieces:
                             jumped_piece = self.board.get_piece_from_cords(jumped_piece_row, jumped_piece_column)

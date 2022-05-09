@@ -1,4 +1,4 @@
-from .constants import ROWS, COLS, WHITE, BROWN
+from .gui_const import ROWS, COLS, WHITE, BROWN
 from .piece import Piece
 import copy
 
@@ -9,6 +9,11 @@ class Board:
         self.black_pieces = self.white_pieces = 12
         self.black_queens = self.white_queens = 0
         self.__create_board()
+
+    def is_square_free(self, row: int, col: int) -> bool:
+        if self.board[row][col] == 0:
+            return True
+        return False
 
     def get_piece_from_cords(self, row, col) -> Piece:
         return self.board[row][col]

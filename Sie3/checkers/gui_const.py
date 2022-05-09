@@ -6,7 +6,6 @@ SQUARE_SIZE = WIDTH//COLS
 PADDING = 15
 OUTLINE = 2
 
-# rgb
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
