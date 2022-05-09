@@ -8,7 +8,6 @@ class Game:
         self.board = Board()
         self.turn = WHITE
         self.valid_moves = {}
-        self.all_valid_moves = []
 
     def check_winner(self):
         winner = self.board.check_winner()
@@ -19,23 +18,23 @@ class Game:
         return None
 
     def select_or_move_piece(self, row, col):
-        #Try to move if selected, if does not work select again
+        # try to move if selected
         if self.selected:
             if not self.__move(row, col):
                 self.selected = None
                 self.select_or_move_piece(row, col)
-
         # select
         piece = self.board.get_piece_from_cords(row, col)
         if piece != 0 and piece.color == self.turn:
             self.selected = piece
-            self.check_all_valid_moves()
-            if not self.__is_piece_possible_to_select(self.selected):
-                self.valid_moves = {}
-                return False
+            self.__block_valid_moves_without_capture(piece)
+
+    def __block_valid_moves_without_capture(self, piece):
+        all_valid_moves = self.__check_all_valid_moves()
+        if not self.__is_piece_possible_to_select(self.selected, all_valid_moves):
+            self.valid_moves = {}
+        else:
             self.valid_moves = self.board.get_valid_moves(piece, possible_moves=[])
-            return True
-        return False
 
     def __move(self, selected_row, selected_column):
         piece = self.board.get_piece_from_cords(selected_row, selected_column)
@@ -54,7 +53,7 @@ class Game:
             return False
         return True
 
-    def check_all_valid_moves(self):
+    def __check_all_valid_moves(self):
         max_jumped_pieces = 0
         all_pieces = self.board.get_all_pieces_for_color(self.turn)
         all_valid_moves = []
@@ -67,16 +66,16 @@ class Game:
                     max_jumped_pieces = jumped_pieces_for_move
                 elif jumped_pieces_for_move == max_jumped_pieces:
                     all_valid_moves.append((piece, valid_moves_for_piece))
-        self.all_valid_moves = all_valid_moves
+        return all_valid_moves
 
-    def __is_piece_possible_to_select(self, piece):
-        for possible_piece_to_select, _ in self.all_valid_moves:
+    @staticmethod
+    def __is_piece_possible_to_select(piece, all_valid_moves):
+        for possible_piece_to_select, _ in all_valid_moves:
             if possible_piece_to_select == piece:
                 return True
         return False
 
     def __change_turn(self):
-        self.all_valid_moves = []
         self.valid_moves = {}
         if self.turn == WHITE:
             self.turn = BROWN
