@@ -1,7 +1,7 @@
 from .gui_const import ROWS, COLS, WHITE, BROWN
 from .piece import Piece
 import copy
-
+from typing import List, Tuple
 
 class Board:
     def __init__(self):
@@ -23,7 +23,7 @@ class Board:
         piece.move(row, col)
         self.__update_queens(piece, row)
 
-    def check_winner(self):
+    def check_winner(self) -> tuple:
         if self.black_pieces <= 0:
             return WHITE
         elif self.white_pieces <= 0:
@@ -63,7 +63,7 @@ class Board:
         else:
             self.white_pieces -= 1
 
-    def get_valid_moves(self, piece, possible_moves=[]):
+    def get_valid_moves_for_piece(self, piece, possible_moves=[]) -> List:
         if piece.queen:
             return self.__get_valid_moves_for_king(piece, possible_moves)
         else:
@@ -171,7 +171,6 @@ class Board:
         start = piece.row, piece.col
         if 0 <= destination_row <= ROWS - 1:
             checked_piece = self.get_piece_from_cords(destination_row, destination_column)
-            print(checked_piece)
             if (not piece.queen and self.__is_correct_row_direction(piece.color, piece.row, destination_row) and \
                 checked_piece is 0) or (piece.queen and checked_piece is 0):
                 destination = destination_row, destination_column
@@ -225,7 +224,7 @@ class Board:
         else:
             return from_row <= to_row
 
-    def get_all_pieces_for_color(self, color):
+    def get_all_pieces_of_color(self, color: Tuple[int, int, int]) -> List[Piece]:
         all_pieces = []
         for row in range(ROWS):
             for column in range(COLS):

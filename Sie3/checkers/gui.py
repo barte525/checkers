@@ -42,7 +42,6 @@ class Gui:
     #         pygame.draw.circle(self.win, BLUE, (col * SQUARE_SIZE + SQUARE_SIZE//2, row * SQUARE_SIZE + SQUARE_SIZE//2), 15)
 
     def __draw_valid_moves(self, moves):
-        print(moves)
         for move in moves:
             _, destination, _ = move
             pygame.draw.circle(self.win, BLUE, (destination[1] * SQUARE_SIZE + SQUARE_SIZE//2, destination[0] * SQUARE_SIZE + SQUARE_SIZE//2), 15)
