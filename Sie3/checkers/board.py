@@ -66,28 +66,36 @@ class Board:
         else:
             self.white_pieces -= 1
 
-    def get_valid_moves_for_piece(self, piece, possible_moves=[]) -> List:
-        if piece.queen:
-            return self.__get_valid_moves_for_king(piece, possible_moves)
-        else:
-            return self.__get_valid_moves_for_man(piece, possible_moves)
+    def get_all_pieces_of_color(self, color: Tuple[int, int, int]) -> List[Piece]:
+        all_pieces: List = []
+        for row in range(ROWS):
+            for column in range(COLS):
+                piece: Piece = self.board[row][column]
+                if piece is not 0 and piece.color == color:
+                    all_pieces.append(piece)
+        return all_pieces
 
-    def __get_valid_moves_for_king(self, piece, possible_moves):
-        diagonals = self.__get_diagonals_for_piece(piece.row, piece.col)
+    def get_valid_moves_for_piece(self, piece: Piece, possible_moves: List = []) -> List:
+        if piece.queen:
+            return self.__get_valid_moves_for_queen(piece, possible_moves)
+        return self.__get_valid_moves_for_man(piece, possible_moves)
+
+    def __get_valid_moves_for_queen(self, piece, possible_moves):
+        diagonals = self.__get_diagonals_for_queen(piece.row, piece.col)
         left_up_diagonal = diagonals[0]
         left_down_diagonal = diagonals[1]
         right_up_diagonal = diagonals[2]
         right_down_diagonal = diagonals[3]
-        moves = self.__is_possible_to_move_for_king(piece, left_up_diagonal)
+        moves = self.__is_possible_to_move_for_queen(piece, left_up_diagonal)
         if moves is not None:
             possible_moves.extend(moves)
-        moves = self.__is_possible_to_move_for_king(piece, left_down_diagonal)
+        moves = self.__is_possible_to_move_for_queen(piece, left_down_diagonal)
         if moves is not None:
             possible_moves.extend(moves)
-        moves = self.__is_possible_to_move_for_king(piece, right_up_diagonal)
+        moves = self.__is_possible_to_move_for_queen(piece, right_up_diagonal)
         if moves is not None:
             possible_moves.extend(moves)
-        moves = self.__is_possible_to_move_for_king(piece, right_down_diagonal)
+        moves = self.__is_possible_to_move_for_queen(piece, right_down_diagonal)
         if moves is not None:
             possible_moves.extend(moves)
         moves_with_jumping = list(filter(lambda move: len(move[2]) > 0, possible_moves))
@@ -96,8 +104,9 @@ class Board:
         else:
             return possible_moves
 
+    # piece
     def __get_valid_moves_for_man(self, piece, possible_moves):
-        possible_moves_for_selected_piece = self.__check_corners_for_piece(piece)
+        possible_moves_for_selected_piece = self.__check_corners_for_man(piece)
         filtered_possible_moves = list(filter(lambda move: move is not None, possible_moves_for_selected_piece))
         moves_with_jumping = list(filter(lambda move: len(move[2]) > 0, filtered_possible_moves))
         for move in possible_moves:
@@ -114,39 +123,7 @@ class Board:
             else:
                 return possible_moves
 
-    def __get_diagonals_for_piece(self, row, column):
-        left_up_diagonal = self.__get_diagonal_for_piece(row, column, False, False)
-        left_down_diagonal = self.__get_diagonal_for_piece(row, column, True, False)
-        right_up_diagonal = self.__get_diagonal_for_piece(row, column, False, True)
-        right_down_diagonal = self.__get_diagonal_for_piece(row, column, True, True)
-        return left_up_diagonal, left_down_diagonal, right_up_diagonal, right_down_diagonal
-
-    def __is_possible_to_move_for_king(self, king, diagonal):
-        possible_moves = []
-        jumped_pieces = []
-        i = 0
-        while i < len(diagonal):
-            checked_piece_row, checked_piece_column = diagonal[i]
-            checked_piece = self.get_piece_from_cords(checked_piece_row, checked_piece_column)
-            start_cords = king.row, king.col
-            destination_cords = checked_piece_row, checked_piece_column
-            if checked_piece is 0:
-                possible_moves.append((start_cords, destination_cords, jumped_pieces))
-            elif checked_piece.color != king.color:
-                if i + 1 < len(diagonal):
-                    jumped_piece_row, jumped_piece_column = checked_piece_row, checked_piece_column
-                    checked_piece_row, checked_piece_column = diagonal[i + 1]
-                    checked_piece = self.get_piece_from_cords(checked_piece_row, checked_piece_column)
-                    if checked_piece is 0:
-                        jumped_pieces = jumped_pieces.copy()
-                        jumped_pieces.append((jumped_piece_row, jumped_piece_column))
-                        possible_moves.append((start_cords, (checked_piece_row, checked_piece_column), jumped_pieces))
-                        i += 1
-            else:
-                return possible_moves
-            i += 1
-        return possible_moves
-
+    # piece and queen
     def __check_more_moves_after_jumping(self, piece, moves_with_jumping):
         for start_piece_cords, destination_piece_cords, jumped_pieces in moves_with_jumping:
             updated_board = copy.deepcopy(self)
@@ -157,19 +134,21 @@ class Board:
                 updated_board.remove(jumped_piece)
             return updated_board.__get_valid_moves_for_man(moved_piece, moves_with_jumping)
 
-    def __check_corners_for_piece(self, piece):
+    # piece
+    def __check_corners_for_man(self, piece):
         possible_moves = []
         left_column, right_column = piece.col - 1, piece.col + 1
         up_row, down_row = piece.row + 1, piece.row - 1
         if 0 <= left_column <= COLS - 1:
-            possible_moves.append(self.__check_piece_for_moving(piece, up_row, left_column, False, False))
-            possible_moves.append(self.__check_piece_for_moving(piece, down_row, left_column, True, False))
+            possible_moves.append(self.__check_piece_for_man(piece, up_row, left_column, False, False))
+            possible_moves.append(self.__check_piece_for_man(piece, down_row, left_column, True, False))
         if 0 <= right_column <= COLS - 1:
-            possible_moves.append(self.__check_piece_for_moving(piece, up_row, right_column, False, True))
-            possible_moves.append(self.__check_piece_for_moving(piece, down_row, right_column, True, True))
+            possible_moves.append(self.__check_piece_for_man(piece, up_row, right_column, False, True))
+            possible_moves.append(self.__check_piece_for_man(piece, down_row, right_column, True, True))
         return possible_moves
 
-    def __check_piece_for_moving(self, piece, destination_row, destination_column, down, right):
+    # piece
+    def __check_piece_for_man(self, piece, destination_row, destination_column, down, right):
         possible_move = None
         start = piece.row, piece.col
         if 0 <= destination_row <= ROWS - 1:
@@ -202,7 +181,54 @@ class Board:
                             possible_move = (start, destination, [jumped_pieces_cords])
         return possible_move
 
-    def __get_diagonal_for_piece(self, row, column, down, right):
+    # piece
+    def __belong_to_board(self, row, column):
+        return 0 <= row <= ROWS - 1 and 0 <= column <= COLS - 1
+
+    # piece
+    def __is_correct_row_direction(self, color, from_row, to_row):
+        if color == WHITE:
+            return from_row >= to_row
+        else:
+            return from_row <= to_row
+
+    # queen
+    def __get_diagonals_for_queen(self, row, column):
+        left_up_diagonal = self.__get_diagonal_for_queen(row, column, False, False)
+        left_down_diagonal = self.__get_diagonal_for_queen(row, column, True, False)
+        right_up_diagonal = self.__get_diagonal_for_queen(row, column, False, True)
+        right_down_diagonal = self.__get_diagonal_for_queen(row, column, True, True)
+        return left_up_diagonal, left_down_diagonal, right_up_diagonal, right_down_diagonal
+
+    # queen
+    def __is_possible_to_move_for_queen(self, king, diagonal):
+        possible_moves = []
+        jumped_pieces = []
+        i = 0
+        while i < len(diagonal):
+            checked_piece_row, checked_piece_column = diagonal[i]
+            checked_piece = self.get_piece_from_cords(checked_piece_row, checked_piece_column)
+            start_cords = king.row, king.col
+            destination_cords = checked_piece_row, checked_piece_column
+            if checked_piece is 0:
+                possible_moves.append((start_cords, destination_cords, jumped_pieces))
+            elif checked_piece.color != king.color:
+                if i + 1 < len(diagonal):
+                    jumped_piece_row, jumped_piece_column = checked_piece_row, checked_piece_column
+                    checked_piece_row, checked_piece_column = diagonal[i + 1]
+                    checked_piece = self.get_piece_from_cords(checked_piece_row, checked_piece_column)
+                    if checked_piece is 0:
+                        jumped_pieces = jumped_pieces.copy()
+                        jumped_pieces.append((jumped_piece_row, jumped_piece_column))
+                        possible_moves.append((start_cords, (checked_piece_row, checked_piece_column), jumped_pieces))
+                        i += 1
+            else:
+                return possible_moves
+            i += 1
+        return possible_moves
+
+    #queen
+    def __get_diagonal_for_queen(self, row, column, down, right):
         diagonal_pieces_cords = []
         while 0 <= row < ROWS and 0 <= column < COLS:
             if down:
@@ -216,22 +242,3 @@ class Board:
             if 0 <= row < ROWS and 0 <= column < COLS:
                 diagonal_pieces_cords.append((row, column))
         return diagonal_pieces_cords
-
-    def __belong_to_board(self, row, column):
-        return 0 <= row <= ROWS - 1 and 0 <= column <= COLS - 1
-
-
-    def __is_correct_row_direction(self, color, from_row, to_row):
-        if color == WHITE:
-            return from_row >= to_row
-        else:
-            return from_row <= to_row
-
-    def get_all_pieces_of_color(self, color: Tuple[int, int, int]) -> List[Piece]:
-        all_pieces = []
-        for row in range(ROWS):
-            for column in range(COLS):
-                piece = self.board[row][column]
-                if piece is not 0 and piece.color == color:
-                    all_pieces.append(piece)
-        return all_pieces
