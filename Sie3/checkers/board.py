@@ -3,6 +3,7 @@ from .piece import Piece
 import copy
 from typing import List, Tuple
 
+List_of_moves = List[Tuple[Tuple[int, int], Tuple[int, int], List[Tuple[int, int]]]]
 
 class Board:
     def __init__(self):
@@ -109,20 +110,12 @@ class Board:
             return possible_moves
 
     # piece
-    def __get_valid_moves_for_man(self, piece, possible_moves_all_pieces):
-        corners_for_piece: List[Tuple[Tuple[int, int], Tuple[int, int], List[Tuple[int, int]]]] \
-            = self.__check_corners_for_man(piece)
-        possible_moves = self.__get_possible_moves_for_man(corners_for_piece)
-        moves_with_capture = self.__get_moves_with_capture(possible_moves)
-        print("possible moves before", possible_moves_all_pieces)
-        print("moves with capture before", moves_with_capture)
-        for move in possible_moves_all_pieces:
-            for jump_move in moves_with_capture:
-                if move[1] == jump_move[0]:
-                    jump_move[2].extend(move[2])
-        print("possible moves after", possible_moves_all_pieces)
-        print("moves with capture after", moves_with_capture)
-        if len(moves_with_capture) > 0:
+    def __get_valid_moves_for_man(self, piece: Piece, possible_moves_all_pieces: List_of_moves) -> List_of_moves:
+        corners_for_piece: List_of_moves = self.__check_corners_for_man(piece)
+        possible_moves: List_of_moves = self.__get_possible_moves_for_man(corners_for_piece)
+        moves_with_capture: List_of_moves = self.__get_moves_with_capture(possible_moves)
+        self.__update_list_with_many_captures(moves_with_capture, possible_moves_all_pieces)
+        if moves_with_capture:
             return self.__check_more_moves_after_jumping(piece, moves_with_capture)
         else:
             possible_moves_all_pieces.extend(possible_moves)
@@ -133,13 +126,23 @@ class Board:
                 return possible_moves_all_pieces
 
     # piece
+    # jesli jest ruch z wieloma biciami to stackujemy pionki zbite podrodze
     @staticmethod
-    def __get_moves_with_capture(possible_moves):
+    def __update_list_with_many_captures(moves_with_capture: List_of_moves, possible_moves_all_pieces: List_of_moves)\
+            -> None:
+        for move in possible_moves_all_pieces:
+            for jump_move in moves_with_capture:
+                if move[1] == jump_move[0]:
+                    jump_move[2].extend(move[2])
+
+    # piece
+    @staticmethod
+    def __get_moves_with_capture(possible_moves: List_of_moves) -> List_of_moves:
         return list(filter(lambda move: len(move[2]) > 0, possible_moves))
 
     # piece
     @staticmethod
-    def __get_possible_moves_for_man(corners_for_piece):
+    def __get_possible_moves_for_man(corners_for_piece: List_of_moves) -> List_of_moves:
         return list(filter(lambda move: move is not None, corners_for_piece))
 
 
