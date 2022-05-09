@@ -63,8 +63,12 @@ class Board:
     def __update_pieces(self, piece: Piece) -> None:
         if piece.color == BROWN:
             self.black_pieces -= 1
+            if piece.queen:
+                self.black_queens -= 1
         else:
             self.white_pieces -= 1
+            if piece.queen:
+                self.white_queens -= 1
 
     def get_all_pieces_of_color(self, color: Tuple[int, int, int]) -> List[Piece]:
         all_pieces: List = []
@@ -110,10 +114,14 @@ class Board:
             = self.__check_corners_for_man(piece)
         possible_moves = self.__get_possible_moves_for_man(corners_for_piece)
         moves_with_capture = self.__get_moves_with_capture(possible_moves)
+        print("possible moves before", possible_moves_all_pieces)
+        print("moves with capture before", moves_with_capture)
         for move in possible_moves_all_pieces:
             for jump_move in moves_with_capture:
                 if move[1] == jump_move[0]:
                     jump_move[2].extend(move[2])
+        print("possible moves after", possible_moves_all_pieces)
+        print("moves with capture after", moves_with_capture)
         if len(moves_with_capture) > 0:
             return self.__check_more_moves_after_jumping(piece, moves_with_capture)
         else:
@@ -157,7 +165,6 @@ class Board:
         if 0 <= right_column <= COLS - 1:
             possible_moves.append(self.__check_piece_for_man(piece, up_row, right_column, False, True))
             possible_moves.append(self.__check_piece_for_man(piece, down_row, right_column, True, True))
-        print(possible_moves)
         return possible_moves
 
     # piece
