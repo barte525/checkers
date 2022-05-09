@@ -35,12 +35,6 @@ class Gui:
             for col in range(row % 2, COLS, 2):
                 pygame.draw.rect(self.win, GREY, (row*SQUARE_SIZE, col*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
-    # def __draw_valid_moves(self, moves):
-    #     print(moves)
-    #     for move in moves:
-    #         row, col = move
-    #         pygame.draw.circle(self.win, BLUE, (col * SQUARE_SIZE + SQUARE_SIZE//2, row * SQUARE_SIZE + SQUARE_SIZE//2), 15)
-
     def __draw_valid_moves(self, moves):
         for move in moves:
             _, destination, _ = move

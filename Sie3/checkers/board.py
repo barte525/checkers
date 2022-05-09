@@ -3,11 +3,14 @@ from .piece import Piece
 import copy
 from typing import List, Tuple
 
+
 class Board:
     def __init__(self):
-        self.board = []
-        self.black_pieces = self.white_pieces = 12
-        self.black_queens = self.white_queens = 0
+        self.board: List = []
+        self.black_pieces: int = 12
+        self.white_pieces: int = 12
+        self.black_queens: int = 0
+        self.white_queens: int = 0
         self.__create_board()
 
     def is_square_free(self, row: int, col: int) -> bool:
@@ -15,10 +18,10 @@ class Board:
             return True
         return False
 
-    def get_piece_from_cords(self, row, col) -> Piece:
+    def get_piece_from_cords(self, row: int, col: int) -> Piece:
         return self.board[row][col]
 
-    def move(self, piece, row, col):
+    def move(self, piece: Piece, row: int, col: int) -> None:
         self.board[piece.row][piece.col], self.board[row][col] = self.board[row][col], self.board[piece.row][piece.col]
         piece.move(row, col)
         self.__update_queens(piece, row)
@@ -30,12 +33,12 @@ class Board:
             return BROWN
         return None
 
-    def remove(self, piece):
+    def remove(self, piece: Piece) -> None:
         if piece != 0:
             self.board[piece.row][piece.col] = 0
             self.__update_pieces(piece)
 
-    def __create_board(self):
+    def __create_board(self) -> None:
         for row in range(ROWS):
             self.board.append([])
             for col in range(COLS):
@@ -49,7 +52,7 @@ class Board:
                 else:
                     self.board[row].append(0)
 
-    def __update_queens(self, piece, row):
+    def __update_queens(self, piece: Piece, row: int) -> None:
         if row == 0 and piece.color == WHITE:
             piece.make_queen()
             self.white_queens += 1
@@ -57,7 +60,7 @@ class Board:
             piece.make_queen()
             self.black_queens += 1
 
-    def __update_pieces(self, piece):
+    def __update_pieces(self, piece: Piece) -> None:
         if piece.color == BROWN:
             self.black_pieces -= 1
         else:
