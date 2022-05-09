@@ -98,30 +98,42 @@ class Board:
         moves = self.__is_possible_to_move_for_queen(piece, right_down_diagonal)
         if moves is not None:
             possible_moves.extend(moves)
-        moves_with_jumping = list(filter(lambda move: len(move[2]) > 0, possible_moves))
+        moves_with_jumping = self.__get_moves_with_capture(possible_moves)
         if moves_with_jumping:
             return self.__check_more_moves_after_jumping(piece, moves_with_jumping)
         else:
             return possible_moves
 
     # piece
-    def __get_valid_moves_for_man(self, piece, possible_moves):
-        possible_moves_for_selected_piece = self.__check_corners_for_man(piece)
-        filtered_possible_moves = list(filter(lambda move: move is not None, possible_moves_for_selected_piece))
-        moves_with_jumping = list(filter(lambda move: len(move[2]) > 0, filtered_possible_moves))
-        for move in possible_moves:
-            for jump_move in moves_with_jumping:
+    def __get_valid_moves_for_man(self, piece, possible_moves_all_pieces):
+        corners_for_piece: List[Tuple[Tuple[int, int], Tuple[int, int], List[Tuple[int, int]]]] \
+            = self.__check_corners_for_man(piece)
+        possible_moves = self.__get_possible_moves_for_man(corners_for_piece)
+        moves_with_capture = self.__get_moves_with_capture(possible_moves)
+        for move in possible_moves_all_pieces:
+            for jump_move in moves_with_capture:
                 if move[1] == jump_move[0]:
                     jump_move[2].extend(move[2])
-        if len(moves_with_jumping) > 0:
-            return self.__check_more_moves_after_jumping(piece, moves_with_jumping)
+        if len(moves_with_capture) > 0:
+            return self.__check_more_moves_after_jumping(piece, moves_with_capture)
         else:
-            possible_moves.extend(filtered_possible_moves)
-            moves_with_jumping = list(filter(lambda move: len(move[2]) > 0, possible_moves))
-            if len(moves_with_jumping) > 0:
-                return moves_with_jumping
+            possible_moves_all_pieces.extend(possible_moves)
+            moves_with_capture = self.__get_moves_with_capture(possible_moves_all_pieces)
+            if len(moves_with_capture) > 0:
+                return moves_with_capture
             else:
-                return possible_moves
+                return possible_moves_all_pieces
+
+    # piece
+    @staticmethod
+    def __get_moves_with_capture(possible_moves):
+        return list(filter(lambda move: len(move[2]) > 0, possible_moves))
+
+    # piece
+    @staticmethod
+    def __get_possible_moves_for_man(corners_for_piece):
+        return list(filter(lambda move: move is not None, corners_for_piece))
+
 
     # piece and queen
     def __check_more_moves_after_jumping(self, piece, moves_with_jumping):
@@ -136,7 +148,7 @@ class Board:
 
     # piece
     def __check_corners_for_man(self, piece):
-        possible_moves = []
+        possible_moves: List = []
         left_column, right_column = piece.col - 1, piece.col + 1
         up_row, down_row = piece.row + 1, piece.row - 1
         if 0 <= left_column <= COLS - 1:
@@ -145,6 +157,7 @@ class Board:
         if 0 <= right_column <= COLS - 1:
             possible_moves.append(self.__check_piece_for_man(piece, up_row, right_column, False, True))
             possible_moves.append(self.__check_piece_for_man(piece, down_row, right_column, True, True))
+        print(possible_moves)
         return possible_moves
 
     # piece
