@@ -111,19 +111,16 @@ class Board:
 
     # piece
     def __get_valid_moves_for_man(self, piece: Piece, possible_moves_all_pieces: List_of_moves) -> List_of_moves:
-        corners_for_piece: List_of_moves = self.__check_corners_for_man(piece)
+        corners_for_piece: List_of_moves = self.__get_corners_for_man(piece)
         possible_moves: List_of_moves = self.__get_possible_moves_for_man(corners_for_piece)
         moves_with_capture: List_of_moves = self.__get_moves_with_capture(possible_moves)
         self.__update_list_with_many_captures(moves_with_capture, possible_moves_all_pieces)
         if moves_with_capture:
             return self.__check_more_moves_after_jumping(piece, moves_with_capture)
+        elif possible_moves_all_pieces:
+            return possible_moves_all_pieces
         else:
-            possible_moves_all_pieces.extend(possible_moves)
-            moves_with_capture = self.__get_moves_with_capture(possible_moves_all_pieces)
-            if len(moves_with_capture) > 0:
-                return moves_with_capture
-            else:
-                return possible_moves_all_pieces
+            return possible_moves
 
     # piece
     # jesli jest ruch z wieloma biciami to stackujemy pionki zbite podrodze
@@ -158,16 +155,18 @@ class Board:
             return updated_board.__get_valid_moves_for_man(moved_piece, moves_with_jumping)
 
     # piece
-    def __check_corners_for_man(self, piece):
-        possible_moves: List = []
-        left_column, right_column = piece.col - 1, piece.col + 1
-        up_row, down_row = piece.row + 1, piece.row - 1
-        if 0 <= left_column <= COLS - 1:
-            possible_moves.append(self.__check_piece_for_man(piece, up_row, left_column, False, False))
-            possible_moves.append(self.__check_piece_for_man(piece, down_row, left_column, True, False))
-        if 0 <= right_column <= COLS - 1:
-            possible_moves.append(self.__check_piece_for_man(piece, up_row, right_column, False, True))
-            possible_moves.append(self.__check_piece_for_man(piece, down_row, right_column, True, True))
+    def __get_corners_for_man(self, piece: Piece) -> List_of_moves:
+        possible_moves: List_of_moves = []
+        left: int = piece.col - 1
+        right: int = piece.col + 1
+        up: int = piece.row + 1
+        down: int = piece.row - 1
+        if 0 <= left <= COLS - 1:
+            possible_moves.append(self.__check_piece_for_man(piece, up, left, False, False))
+            possible_moves.append(self.__check_piece_for_man(piece, down, left, True, False))
+        if 0 <= right <= COLS - 1:
+            possible_moves.append(self.__check_piece_for_man(piece, up, right, False, True))
+            possible_moves.append(self.__check_piece_for_man(piece, down, right, True, True))
         return possible_moves
 
     # piece
