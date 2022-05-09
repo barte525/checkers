@@ -26,12 +26,12 @@ class Engine:
                 self.selected = None
                 self.select_or_move_piece(row, col)
         # select
-        piece = self.board.get_piece_from_cords(row, col)
+        piece: Piece = self.board.get_piece_from_cords(row, col)
         if piece != 0 and piece.color == self.turn:
             self.selected = piece
             self.__get_valid_moves_with_max_captures(piece)
 
-    def __get_valid_moves_with_max_captures(self, piece):
+    def __get_valid_moves_with_max_captures(self, piece: Piece) -> None:
         if not self.__is_piece_possible_to_select(self.selected, self.__get_all_moves_with_max_captures()):
             self.valid_moves = []
         else:
@@ -49,13 +49,13 @@ class Engine:
                     return True
         return False
 
-    def __remove_captured_pieces(self, captured_pieces):
+    def __remove_captured_pieces(self, captured_pieces: List[Tuple[int, int]]) -> None:
         if captured_pieces:
             for pieces_cords in captured_pieces:
                 self.board.remove(self.board.get_piece_from_cords(pieces_cords[0], pieces_cords[1]))
 
     @staticmethod
-    def __check_if_move_is_valid(row, selected_row, col, selected_col):
+    def __check_if_move_is_valid(row: int, selected_row: int, col: int, selected_col: int) -> bool:
         return row == selected_row and col == selected_col
 
     @staticmethod
@@ -76,24 +76,25 @@ class Engine:
         return moves_with_max_captures
 
     @staticmethod
-    def __update_moves_with_max_captures(max_captured_pieces, moves_with_max_captures, piece, valid_moves_for_piece):
-        number_of_captured_pieces = len(valid_moves_for_piece[0][2])
+    def __update_moves_with_max_captures(max_captured_pieces: int, moves_with_max_captures: list,
+                                         piece: Piece, valid_moves_for_piece: list) -> Tuple[List, int]:
+        number_of_captured_pieces: int = len(valid_moves_for_piece[0][2])
         if number_of_captured_pieces > max_captured_pieces:
-            moves_with_max_captures = [(piece, valid_moves_for_piece)]
+            moves_with_max_captures: list = [(piece, valid_moves_for_piece)]
             max_captured_pieces = number_of_captured_pieces
         if number_of_captured_pieces == max_captured_pieces:
             moves_with_max_captures.append((piece, valid_moves_for_piece))
         return moves_with_max_captures, max_captured_pieces
 
     @staticmethod
-    def __is_piece_possible_to_select(piece, all_valid_moves):
+    def __is_piece_possible_to_select(piece: Piece, all_valid_moves: List) -> bool:
         for possible_piece_to_select, _ in all_valid_moves:
             if possible_piece_to_select == piece:
                 return True
         return False
 
     def __change_turn(self):
-        self.valid_moves = []
+        self.valid_moves: list = []
         if self.turn == WHITE:
             self.turn = BROWN
         else:
