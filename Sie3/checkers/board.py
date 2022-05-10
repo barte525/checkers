@@ -3,7 +3,8 @@ from .piece import Piece
 import copy
 from typing import List, Tuple
 
-List_of_moves = List[Tuple[Tuple[int, int], Tuple[int, int], List[Tuple[int, int]]]]
+Move = Tuple[Tuple[int, int], Tuple[int, int], List[Tuple[int, int]]]
+List_of_moves = List[Move]
 
 class Board:
     def __init__(self):
@@ -109,9 +110,9 @@ class Board:
         else:
             return possible_moves
 
-    # piece
+    # piece, queen
     def __get_valid_moves_for_man(self, piece: Piece, possible_moves_all_pieces: List_of_moves) -> List_of_moves:
-        corners_for_piece: List_of_moves = self.__get_corners_for_man(piece)
+        corners_for_piece: List_of_moves = self.__get_diagonals_for_piece(piece)
         possible_moves: List_of_moves = self.__get_possible_moves_for_man(corners_for_piece)
         moves_with_capture: List_of_moves = self.__get_moves_with_capture(possible_moves)
         self.__update_list_with_many_captures(moves_with_capture, possible_moves_all_pieces)
@@ -155,64 +156,62 @@ class Board:
             return updated_board.__get_valid_moves_for_man(moved_piece, moves_with_jumping)
 
     # piece
-    def __get_corners_for_man(self, piece: Piece) -> List_of_moves:
+    def __get_diagonals_for_piece(self, piece: Piece) -> List_of_moves:
         possible_moves: List_of_moves = []
         left: int = piece.col - 1
         right: int = piece.col + 1
         up: int = piece.row + 1
         down: int = piece.row - 1
-        if 0 <= left <= COLS - 1:
-            possible_moves.append(self.__check_piece_for_man(piece, up, left, False, False))
-            possible_moves.append(self.__check_piece_for_man(piece, down, left, True, False))
-        if 0 <= right <= COLS - 1:
-            possible_moves.append(self.__check_piece_for_man(piece, up, right, False, True))
-            possible_moves.append(self.__check_piece_for_man(piece, down, right, True, True))
+        possible_moves.append(self.__check_diagonals_for_piece(piece, up, left, False, False))
+        possible_moves.append(self.__check_diagonals_for_piece(piece, down, left, True, False))
+        possible_moves.append(self.__check_diagonals_for_piece(piece, up, right, False, True))
+        possible_moves.append(self.__check_diagonals_for_piece(piece, down, right, True, True))
         return possible_moves
 
     # piece
-    def __check_piece_for_man(self, piece, destination_row, destination_column, down, right):
-        possible_move = None
-        start = piece.row, piece.col
-        if 0 <= destination_row <= ROWS - 1:
-            checked_piece = self.get_piece_from_cords(destination_row, destination_column)
-            if (not piece.queen and self.__is_correct_row_direction(piece.color, piece.row, destination_row) and \
-                checked_piece is 0) or (piece.queen and checked_piece is 0):
-                destination = destination_row, destination_column
-                possible_move = (start, destination, [])
-            elif checked_piece is not 0:
-                if checked_piece.color != piece.color:
-                    if down and not right and self.__belong_to_board(destination_row - 1, destination_column - 1):
-                        if self.get_piece_from_cords(destination_row - 1, destination_column - 1) is 0:
-                            destination = destination_row - 1, destination_column - 1
-                            jumped_pieces_cords = destination_row, destination_column
-                            possible_move = (start, destination, [jumped_pieces_cords])
-                    if not down and not right and self.__belong_to_board(destination_row + 1, destination_column - 1):
-                        if self.get_piece_from_cords(destination_row + 1, destination_column - 1) is 0:
-                            destination = destination_row + 1, destination_column - 1
-                            jumped_pieces_cords = destination_row, destination_column
-                            possible_move = (start, destination, [jumped_pieces_cords])
-                    if down and right and self.__belong_to_board(destination_row - 1, destination_column + 1):
-                        if self.get_piece_from_cords(destination_row - 1, destination_column + 1) is 0:
-                            destination = destination_row - 1, destination_column + 1
-                            jumped_pieces_cords = destination_row, destination_column
-                            possible_move = (start, destination, [jumped_pieces_cords])
-                    if not down and right and self.__belong_to_board(destination_row + 1, destination_column + 1):
-                        if self.get_piece_from_cords(destination_row + 1, destination_column + 1) is 0:
-                            destination = destination_row + 1, destination_column + 1
-                            jumped_pieces_cords = destination_row, destination_column
-                            possible_move = (start, destination, [jumped_pieces_cords])
-        return possible_move
+    def __check_diagonals_for_piece(self, piece: Piece, destination_row: int, destination_column: int, down: bool,
+                                    right: bool) -> Move:
+        if not self.__check_if_in_board(destination_row, destination_column):
+            return None
+        if self.is_square_free(destination_row, destination_column):
+            if Board.__move_one_square(piece, destination_row):
+                return (piece.row, piece.col), (destination_row, destination_column), []
+            # move backwards with man
+            return None
+        elif self.get_piece_from_cords(destination_row, destination_column).color != piece.color:
+            if down and not right and self.__check_if_in_board(destination_row - 1, destination_column - 1):
+                if self.get_piece_from_cords(destination_row - 1, destination_column - 1) is 0:
+                    destination = destination_row - 1, destination_column - 1
+                    jumped_pieces_cords = destination_row, destination_column
+                    return (piece.row, piece.col), destination, [jumped_pieces_cords]
+            if not down and not right and self.__check_if_in_board(destination_row + 1, destination_column - 1):
+                if self.get_piece_from_cords(destination_row + 1, destination_column - 1) is 0:
+                    destination = destination_row + 1, destination_column - 1
+                    jumped_pieces_cords = destination_row, destination_column
+                    return (piece.row, piece.col), destination, [jumped_pieces_cords]
+            if down and right and self.__check_if_in_board(destination_row - 1, destination_column + 1):
+                if self.get_piece_from_cords(destination_row - 1, destination_column + 1) is 0:
+                    destination = destination_row - 1, destination_column + 1
+                    jumped_pieces_cords = destination_row, destination_column
+                    return (piece.row, piece.col), destination, [jumped_pieces_cords]
+            if not down and right and self.__check_if_in_board(destination_row + 1, destination_column + 1):
+                if self.get_piece_from_cords(destination_row + 1, destination_column + 1) is 0:
+                    destination = destination_row + 1, destination_column + 1
+                    jumped_pieces_cords = destination_row, destination_column
+                    return (piece.row, piece.col), destination, [jumped_pieces_cords]
 
-    # piece
-    def __belong_to_board(self, row, column):
-        return 0 <= row <= ROWS - 1 and 0 <= column <= COLS - 1
+    @staticmethod
+    def __check_if_in_board(row: int, col: int):
+        return 0 <= col <= COLS - 1 and 0 <= row <= ROWS - 1
 
-    # piece
-    def __is_correct_row_direction(self, color, from_row, to_row):
-        if color == WHITE:
-            return from_row >= to_row
+    @staticmethod
+    def __move_one_square(piece: Piece, destination_row: int) -> bool:
+        if piece.queen:
+            return True
+        if piece.color == WHITE:
+            return piece.row >= destination_row
         else:
-            return from_row <= to_row
+            return piece.row <= destination_row
 
     # queen
     def __get_diagonals_for_queen(self, row, column):
