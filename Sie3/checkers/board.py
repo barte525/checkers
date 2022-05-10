@@ -54,6 +54,7 @@ class Board:
         #                 self.board[row].append(0)
         #         else:
         #             self.board[row].append(0)
+
         for row in range(ROWS):
             self.board.append([])
             for col in range(COLS):
@@ -64,7 +65,16 @@ class Board:
         self.board[3][6] = queen
         self.board[4][5] = Piece(4, 5, color=BROWN)
         self.board[4][3] = Piece(4, 3, color=BROWN)
-
+        # for row in range(ROWS):
+        #     self.board.append([])
+        #     for col in range(COLS):
+        #         self.board[row].append(0)
+        # queen = Piece(2, 7, color=WHITE)
+        # queen.queen = True
+        #
+        # self.board[2][7] = queen
+        # self.board[4][5] = Piece(4, 5, color=BROWN)
+        # self.board[3][2] = Piece(3, 2, color=BROWN)
 
     def __update_queens(self, piece: Piece, row: int) -> None:
         if row == 0 and piece.color == WHITE:
@@ -137,23 +147,31 @@ class Board:
     def __update_list_with_many_captures(moves_with_capture: List_of_moves, possible_moves_all_pieces: List_of_moves) \
             -> None:
         for move in possible_moves_all_pieces:
-            for jump_move in moves_with_capture:
-                if move[1] == jump_move[0]:
-                    jump_move[2].extend(move[2])
+            for captured in moves_with_capture:
+                # jesli początkowe miejsce w ruchu z zbiciem jest równe docelowemu w ruchu
+                if move[1] == captured[0]:
+                    captured[2].extend(move[2])
 
     @staticmethod
     def __get_moves_with_capture(possible_moves: List_of_moves) -> List_of_moves:
-        return list(filter(lambda move: len(move[2]) > 0, possible_moves))
+        result: List_of_moves = []
+        for move in possible_moves:
+            if move[2]:
+                result.append(move)
+        return result
 
     def __get_valid_moves_for_man_after_capture(self, piece: Piece, moves_with_jumping: List_of_moves) -> List_of_moves:
-        for start_piece_cords, destination_piece_cords, jumped_pieces in moves_with_jumping:
-            updated_board = copy.deepcopy(self)
-            moved_piece = copy.deepcopy(piece)
-            updated_board.move(moved_piece, destination_piece_cords[0], destination_piece_cords[1])
-            for jumped_piece_row, jumped_piece_column in jumped_pieces:
-                jumped_piece = updated_board.get_piece_from_cords(jumped_piece_row, jumped_piece_column)
-                updated_board.remove(jumped_piece)
-            return updated_board.__get_valid_moves_for_man(moved_piece, moves_with_jumping)
+        for move in moves_with_jumping:
+            board_after_capture: Board = copy.deepcopy(self)
+            moved_piece: Piece = copy.deepcopy(piece)
+            board_after_capture.move(moved_piece, move[1][0], move[1][1])
+            self.removed_captured_pieces(move[2], board_after_capture)
+            return board_after_capture.__get_valid_moves_for_man(moved_piece, moves_with_jumping)
+
+    @staticmethod
+    def removed_captured_pieces(captured_pieces: List[Tuple[int, int]], board_after_capture) -> None:
+        for captured_piece in captured_pieces:
+            board_after_capture.remove(board_after_capture.get_piece_from_cords(captured_piece[0], captured_piece[1]))
 
     def __get_diagonals_for_piece(self, piece: Piece) -> List_of_moves:
         possible_moves: List_of_moves = []
@@ -168,8 +186,12 @@ class Board:
         return self.__get_possible_moves_for_man(possible_moves)
 
     @staticmethod
-    def __get_possible_moves_for_man(corners_for_piece: List_of_moves) -> List_of_moves:
-        return list(filter(lambda move: move is not None, corners_for_piece))
+    def __get_possible_moves_for_man(possible_moves: List_of_moves) -> List_of_moves:
+        result: List_of_moves = []
+        for move in possible_moves:
+            if move:
+                result.append(move)
+        return result
 
     def __check_diagonals_for_piece(self, piece: Piece, destination_row: int, destination_column: int, direction: str) \
             -> Move:
