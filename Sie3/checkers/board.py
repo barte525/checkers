@@ -6,6 +6,7 @@ from typing import List, Tuple
 Move = Tuple[Tuple[int, int], Tuple[int, int], List[Tuple[int, int]]]
 List_of_moves = List[Move]
 
+
 class Board:
     def __init__(self):
         self.board: List = []
@@ -58,7 +59,7 @@ class Board:
         if row == 0 and piece.color == WHITE:
             piece.make_queen()
             self.white_queens += 1
-        if row == ROWS-1 and piece.color == BROWN:
+        if row == ROWS - 1 and piece.color == BROWN:
             piece.make_queen()
             self.black_queens += 1
 
@@ -126,7 +127,7 @@ class Board:
     # piece
     # jesli jest ruch z wieloma biciami to stackujemy pionki zbite podrodze
     @staticmethod
-    def __update_list_with_many_captures(moves_with_capture: List_of_moves, possible_moves_all_pieces: List_of_moves)\
+    def __update_list_with_many_captures(moves_with_capture: List_of_moves, possible_moves_all_pieces: List_of_moves) \
             -> None:
         for move in possible_moves_all_pieces:
             for jump_move in moves_with_capture:
@@ -142,7 +143,6 @@ class Board:
     @staticmethod
     def __get_possible_moves_for_man(corners_for_piece: List_of_moves) -> List_of_moves:
         return list(filter(lambda move: move is not None, corners_for_piece))
-
 
     # piece and queen
     def __check_more_moves_after_jumping(self, piece, moves_with_jumping):
@@ -162,43 +162,24 @@ class Board:
         right: int = piece.col + 1
         up: int = piece.row + 1
         down: int = piece.row - 1
-        possible_moves.append(self.__check_diagonals_for_piece(piece, up, left, False, False))
-        possible_moves.append(self.__check_diagonals_for_piece(piece, down, left, True, False))
-        possible_moves.append(self.__check_diagonals_for_piece(piece, up, right, False, True))
-        possible_moves.append(self.__check_diagonals_for_piece(piece, down, right, True, True))
+        possible_moves.append(self.__check_diagonals_for_piece(piece, up, left, "up_left"))
+        possible_moves.append(self.__check_diagonals_for_piece(piece, down, left, "down_left"))
+        possible_moves.append(self.__check_diagonals_for_piece(piece, up, right, "up_right"))
+        possible_moves.append(self.__check_diagonals_for_piece(piece, down, right, "down_right"))
         return possible_moves
 
     # piece
-    def __check_diagonals_for_piece(self, piece: Piece, destination_row: int, destination_column: int, down: bool,
-                                    right: bool) -> Move:
+    def __check_diagonals_for_piece(self, piece: Piece, destination_row: int, destination_column: int, direction: str) \
+            -> Move:
         if not self.__check_if_in_board(destination_row, destination_column):
             return None
         if self.is_square_free(destination_row, destination_column):
             if Board.__move_one_square(piece, destination_row):
                 return (piece.row, piece.col), (destination_row, destination_column), []
-            # move backwards with man
             return None
-        elif self.get_piece_from_cords(destination_row, destination_column).color != piece.color:
-            if down and not right and self.__check_if_in_board(destination_row - 1, destination_column - 1):
-                if self.get_piece_from_cords(destination_row - 1, destination_column - 1) is 0:
-                    destination = destination_row - 1, destination_column - 1
-                    jumped_pieces_cords = destination_row, destination_column
-                    return (piece.row, piece.col), destination, [jumped_pieces_cords]
-            if not down and not right and self.__check_if_in_board(destination_row + 1, destination_column - 1):
-                if self.get_piece_from_cords(destination_row + 1, destination_column - 1) is 0:
-                    destination = destination_row + 1, destination_column - 1
-                    jumped_pieces_cords = destination_row, destination_column
-                    return (piece.row, piece.col), destination, [jumped_pieces_cords]
-            if down and right and self.__check_if_in_board(destination_row - 1, destination_column + 1):
-                if self.get_piece_from_cords(destination_row - 1, destination_column + 1) is 0:
-                    destination = destination_row - 1, destination_column + 1
-                    jumped_pieces_cords = destination_row, destination_column
-                    return (piece.row, piece.col), destination, [jumped_pieces_cords]
-            if not down and right and self.__check_if_in_board(destination_row + 1, destination_column + 1):
-                if self.get_piece_from_cords(destination_row + 1, destination_column + 1) is 0:
-                    destination = destination_row + 1, destination_column + 1
-                    jumped_pieces_cords = destination_row, destination_column
-                    return (piece.row, piece.col), destination, [jumped_pieces_cords]
+        if self.get_piece_from_cords(destination_row, destination_column).color == piece.color:
+            return None
+        return self.__try_to_capture(direction, piece, destination_row, destination_column)
 
     @staticmethod
     def __check_if_in_board(row: int, col: int):
@@ -212,6 +193,22 @@ class Board:
             return piece.row >= destination_row
         else:
             return piece.row <= destination_row
+
+    def __try_to_capture(self, direction: str, piece: Piece, destination_row: int, destination_column: int) -> Move:
+        captured_piece = (destination_row, destination_column)
+        if direction == 'down_left' and self.__check_if_in_board(destination_row - 1, destination_column - 1) \
+                and self.is_square_free(destination_row - 1, destination_column - 1):
+            return (piece.row, piece.col), (destination_row - 1, destination_column - 1), [captured_piece]
+        if direction == "up_left" and self.__check_if_in_board(destination_row + 1, destination_column - 1) \
+                and self.is_square_free(destination_row + 1, destination_column - 1):
+            return (piece.row, piece.col), (destination_row + 1, destination_column - 1), [captured_piece]
+        if direction == "down_right" and self.__check_if_in_board(destination_row - 1, destination_column + 1) \
+                and self.is_square_free(destination_row - 1, destination_column + 1):
+            return (piece.row, piece.col), (destination_row - 1, destination_column + 1), [captured_piece]
+        if direction == "up_right" and self.__check_if_in_board(destination_row + 1, destination_column + 1) \
+                and self.is_square_free(destination_row + 1, destination_column + 1):
+            return (piece.row, piece.col), (destination_row + 1, destination_column + 1), [captured_piece]
+        return None
 
     # queen
     def __get_diagonals_for_queen(self, row, column):
@@ -248,7 +245,7 @@ class Board:
             i += 1
         return possible_moves
 
-    #queen
+    # queen
     def __get_diagonal_for_queen(self, row, column, down, right):
         diagonal_pieces_cords = []
         while 0 <= row < ROWS and 0 <= column < COLS:
