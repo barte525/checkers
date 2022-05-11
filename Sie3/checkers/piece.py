@@ -3,7 +3,7 @@ class Piece:
         self.row = row
         self.col = col
         self.color = color
-        self.queen = False
+        self.queen = True
         self.x = 0
         self.y = 0
 
