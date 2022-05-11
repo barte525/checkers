@@ -55,16 +55,16 @@ class Board:
         #         else:
         #             self.board[row].append(0)
 
-        # for row in range(ROWS):
-        #     self.board.append([])
-        #     for col in range(COLS):
-        #         self.board[row].append(0)
-        # queen = Piece(3, 6, color=WHITE)
-        # queen.queen = True
-        #
-        # self.board[3][6] = queen
-        # self.board[4][5] = Piece(4, 5, color=BROWN)
-        # self.board[5][4] = Piece(5, 4, color=BROWN)
+        for row in range(ROWS):
+            self.board.append([])
+            for col in range(COLS):
+                self.board[row].append(0)
+        queen = Piece(3, 6, color=WHITE)
+        queen.queen = True
+
+        self.board[3][6] = queen
+        self.board[4][5] = Piece(4, 5, color=BROWN)
+        self.board[5][4] = Piece(5, 4, color=BROWN)
         # for row in range(ROWS):
         #     self.board.append([])
         #     for col in range(COLS):
@@ -79,20 +79,30 @@ class Board:
         # self.board[3][2] = Piece(3, 2, color=BROWN)
         # self.board[5][2] = Piece(5, 2, color=BROWN)
         # self.board[7][0] = Piece(7, 0, color=BROWN)
-        for row in range(ROWS):
-            self.board.append([])
-            for col in range(COLS):
-                self.board[row].append(0)
-        queen1 = Piece(0, 1, color=WHITE)
-        queen1.queen = True
-        queen2 = Piece(0, 5, color=WHITE)
-        queen2.queen = True
-
-        self.board[0][1] = queen1
-        self.board[0][5] = queen2
-        self.board[2][3] = Piece(2, 3, color=BROWN)
-        self.board[4][3] = Piece(4, 3, color=BROWN)
-        self.board[6][1] = Piece(6, 1, color=BROWN)
+        # for row in range(ROWS):
+        #     self.board.append([])
+        #     for col in range(COLS):
+        #         self.board[row].append(0)
+        # queen1 = Piece(0, 1, color=WHITE)
+        # queen1.queen = True
+        # queen2 = Piece(0, 5, color=WHITE)
+        # queen2.queen = True
+        #
+        # self.board[0][1] = queen1
+        # self.board[0][5] = queen2
+        # self.board[2][3] = Piece(2, 3, color=BROWN)
+        # self.board[4][3] = Piece(4, 3, color=BROWN)
+        # self.board[6][1] = Piece(6, 1, color=BROWN)
+        # for row in range(ROWS):
+        #     self.board.append([])
+        #     for col in range(COLS):
+        #         self.board[row].append(0)
+        # queen = Piece(2, 7, color=WHITE)
+        # queen.queen = True
+        #
+        # self.board[2][7] = queen
+        # self.board[5][4] = Piece(5, 4, color=BROWN)
+        # self.board[4][1] = Piece(4, 1, color=BROWN)
 
     def __update_queens(self, piece: Piece, row: int) -> None:
         if row == 0 and piece.color == WHITE:
@@ -279,8 +289,8 @@ class Board:
             if checked_piece == 0:
                 possible_moves.append((start_cords, destination_cords, captured_pieces))
             elif checked_piece.color != queen.color and i + 1 < len(diagonal) and not captured:
-                captured, i = self.__try_capture_as_queen(captured, captured_pieces, diagonal, i, possible_moves, start_cords)
-                # 2 pieces in row, because capture failed
+                captured, captured_pieces, i = self.__try_capture_as_queen(captured, captured_pieces, diagonal, i, possible_moves, start_cords)
+                # there are 2 pieces in row in diagonal, because capture failed
                 if not captured:
                     return possible_moves
             else:
@@ -296,16 +306,17 @@ class Board:
         return checked_piece, destination_cords, start_cords
 
     def __try_capture_as_queen(self, captured: bool, captured_pieces: List[Tuple[int, int]], diagonal: List[Tuple[int, int]],
-                               i: int, possible_moves: List_of_moves, start_cords: Tuple[int, int]) -> Tuple[bool, int]:
+                               i: int, possible_moves: List_of_moves, start_cords: Tuple[int, int]) -> Tuple[bool, List[Tuple[int, int]], int]:
         jumped_piece_row, jumped_piece_column = diagonal[i]
         checked_piece_row, checked_piece_column = diagonal[i + 1]
         checked_piece: Piece = self.get_piece_from_cords(checked_piece_row, checked_piece_column)
         if checked_piece == 0:
             captured = True
+            captured_pieces = captured_pieces.copy()
             captured_pieces.append((jumped_piece_row, jumped_piece_column))
             possible_moves.append((start_cords, (checked_piece_row, checked_piece_column), captured_pieces))
             i += 1
-        return captured, i
+        return captured, captured_pieces, i
 
     @staticmethod
     def __get_full_diagonal(row: int, col: int, go_down: bool, go_right: bool) -> List[Tuple[int, int]]:
