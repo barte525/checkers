@@ -6,7 +6,7 @@ class Piece:
         self.row: int = row
         self.col: int = col
         self.color: Color = color
-        self.queen: bool = True
+        self.queen: bool = False
         # fields for gui
         self.x: float = 0
         self.y: float = 0

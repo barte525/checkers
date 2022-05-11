@@ -1,4 +1,4 @@
-from .const import WHITE, BROWN
+from .const import WHITE, BROWN, Color
 from checkers.board import Board
 from checkers.piece import Piece
 from typing import List, Tuple
@@ -7,8 +7,8 @@ from typing import List, Tuple
 class Engine:
     def __init__(self):
         self.selected: Piece = None
-        self.board = Board()
-        self.turn = WHITE
+        self.board: Board = Board()
+        self.turn: Color = WHITE
         self.valid_moves: List = []
 
     def check_winner(self) -> str:

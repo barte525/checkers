@@ -6,6 +6,7 @@ ROWS: int = 8
 COLS: int = 8
 SQUARE: float = WIDTH // COLS
 PADDING: int = 15
+CURSOR_SIZE: int = 20
 
 Color = Tuple[int, int, int]
 WHITE: Color = (255, 255, 255)

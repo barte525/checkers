@@ -9,7 +9,7 @@ List_of_moves = List[Move]
 
 class Board:
     def __init__(self):
-        self.board: List = []
+        self.board: List[List[Piece]] = []
         self.black_pieces: int = 12
         self.white_pieces: int = 12
         self.black_queens: int = 0
