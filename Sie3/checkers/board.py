@@ -69,12 +69,16 @@ class Board:
         #     self.board.append([])
         #     for col in range(COLS):
         #         self.board[row].append(0)
-        # queen = Piece(2, 7, color=WHITE)
-        # queen.queen = True
+        # queen1 = Piece(1, 0, color=WHITE)
+        # queen1.queen = True
+        # queen2 = Piece(1, 4, color=WHITE)
+        # queen2.queen = True
         #
-        # self.board[2][7] = queen
-        # self.board[4][5] = Piece(4, 5, color=BROWN)
+        # self.board[1][0] = queen1
+        # self.board[1][4] = queen2
         # self.board[3][2] = Piece(3, 2, color=BROWN)
+        # self.board[5][2] = Piece(5, 2, color=BROWN)
+        # self.board[7][0] = Piece(7, 0, color=BROWN)
 
     def __update_queens(self, piece: Piece, row: int) -> None:
         if row == 0 and piece.color == WHITE:
@@ -105,30 +109,24 @@ class Board:
 
     def get_valid_moves_for_piece(self, piece: Piece, possible_moves: List = []) -> List:
         if piece.queen:
-            print(self.__get_valid_moves_for_queen(piece, possible_moves, ''))
-            return self.__get_valid_moves_for_queen(piece, possible_moves, '')
+            return self.__get_valid_moves_for_queen(piece, possible_moves)
         return self.__get_valid_moves_for_man(piece, possible_moves)
 
-    def __get_valid_moves_for_queen(self, piece, possible_moves_all, forbidden_direction: str) -> List_of_moves:
+    def __get_valid_moves_for_queen(self, piece: Piece, possible_moves_all: List_of_moves) -> List_of_moves:
         possible_moves: List_of_moves = []
-        left_up_diagonal: List[Tuple[int, int]] = self.__get_full_diagonal(piece.row, piece.col, go_down=False,
-                                                                           go_right=False)
-        left_down_diagonal: List[Tuple[int, int]] = self.__get_full_diagonal(piece.row, piece.col, go_down=True,
-                                                                             go_right=False)
-        right_up_diagonal: List[Tuple[int, int]] = self.__get_full_diagonal(piece.row, piece.col, go_down=False,
-                                                                            go_right=True)
-        right_down_diagonal: List[Tuple[int, int]] = self.__get_full_diagonal(piece.row, piece.col, go_down=True,
-                                                                              go_right=True)
-        if not (forbidden_direction == 'left_up'):possible_moves.extend(self.__check_diagonal_for_queen(piece, left_up_diagonal))
-        if not (forbidden_direction == 'left_down'): possible_moves.extend(self.__check_diagonal_for_queen(piece, left_down_diagonal))
-        if not (forbidden_direction == 'right_up'): possible_moves.extend(self.__check_diagonal_for_queen(piece, right_up_diagonal))
-        if not (forbidden_direction == 'right_down'): possible_moves.extend(self.__check_diagonal_for_queen(piece, right_down_diagonal))
+        left_up_diagonal: List[Tuple[int, int]] = self.__get_full_diagonal(piece.row, piece.col, go_down=False, go_right=False)
+        left_down_diagonal: List[Tuple[int, int]] = self.__get_full_diagonal(piece.row, piece.col, go_down=True, go_right=False)
+        right_up_diagonal: List[Tuple[int, int]] = self.__get_full_diagonal(piece.row, piece.col, go_down=False, go_right=True)
+        right_down_diagonal: List[Tuple[int, int]] = self.__get_full_diagonal(piece.row, piece.col, go_down=True, go_right=True)
+        possible_moves.extend(self.__check_diagonal_for_queen(piece, left_up_diagonal))
+        possible_moves.extend(self.__check_diagonal_for_queen(piece, left_down_diagonal))
+        possible_moves.extend(self.__check_diagonal_for_queen(piece, right_up_diagonal))
+        possible_moves.extend(self.__check_diagonal_for_queen(piece, right_down_diagonal))
         possible_moves: List_of_moves = Board.__get_only_valid_moves(possible_moves)
         moves_with_capture: List_of_moves = self.__get_moves_with_capture(possible_moves)
         self.__update_list_with_many_captures(moves_with_capture, possible_moves_all)
         if moves_with_capture:
-            return Board.get_moves_with_max_captures(
-                self.__get_valid_moves_for_queen_after_capture(piece, moves_with_capture, forbidden_direction))
+            return Board.get_moves_with_max_captures(self.__get_valid_moves_for_queen_after_capture(piece, moves_with_capture))
         elif possible_moves_all:
             return Board.get_moves_with_max_captures(possible_moves_all)
         return Board.get_moves_with_max_captures(possible_moves)
@@ -163,7 +161,9 @@ class Board:
             for captured in moves_with_capture:
                 # jesli początkowe miejsce w ruchu z zbiciem jest równe docelowemu w ruchu
                 if move[1] == captured[0]:
-                    captured[2].extend(move[2])
+                    for move_to_add in move[2]:
+                        if move_to_add not in captured[2]:
+                            captured[2].append(move_to_add)
 
     @staticmethod
     def __get_moves_with_capture(possible_moves: List_of_moves) -> List_of_moves:
@@ -181,8 +181,7 @@ class Board:
             self.removed_captured_pieces(move[2], board_after_capture)
             return board_after_capture.__get_valid_moves_for_man(moved_piece, moves_with_jumping)
 
-    def __get_valid_moves_for_queen_after_capture(self, piece: Piece,
-                                                  moves_with_jumping: List_of_moves) -> List_of_moves:
+    def __get_valid_moves_for_queen_after_capture(self, piece: Piece, moves_with_jumping: List_of_moves) -> List_of_moves:
         result = []
         for move in moves_with_jumping:
             board_after_capture: Board = copy.deepcopy(self)
@@ -256,27 +255,33 @@ class Board:
             return (piece.row, piece.col), (destination_row + 1, destination_column + 1), [captured_piece]
         return None
 
-    def __check_diagonal_for_queen(self, king, diagonal):
-        possible_moves = []
-        jumped_pieces = []
-        i = 0
+    def __check_diagonal_for_queen(self, queen: Piece, diagonal: List[Tuple[int, int]]) -> List_of_moves:
+        possible_moves: List_of_moves = []
+        jumped_pieces: List[Tuple[int, int]] = []
+        i: int = 0
+        captured: bool = False
         while i < len(diagonal):
             checked_piece_row, checked_piece_column = diagonal[i]
             checked_piece = self.get_piece_from_cords(checked_piece_row, checked_piece_column)
-            start_cords = king.row, king.col
+            start_cords = queen.row, queen.col
             destination_cords = checked_piece_row, checked_piece_column
-            if checked_piece is 0:
+            if checked_piece == 0:
                 possible_moves.append((start_cords, destination_cords, jumped_pieces))
-            elif checked_piece.color != king.color:
-                if i + 1 < len(diagonal):
+            elif captured:
+                return possible_moves
+            elif checked_piece.color != queen.color and i + 1 < len(diagonal):
                     jumped_piece_row, jumped_piece_column = checked_piece_row, checked_piece_column
                     checked_piece_row, checked_piece_column = diagonal[i + 1]
                     checked_piece = self.get_piece_from_cords(checked_piece_row, checked_piece_column)
                     if checked_piece is 0:
+                        captured = True
                         jumped_pieces = jumped_pieces.copy()
-                        jumped_pieces.append((jumped_piece_row, jumped_piece_column))
-                        possible_moves.append((start_cords, (checked_piece_row, checked_piece_column), jumped_pieces))
+                        if (jumped_piece_row, jumped_piece_column) not in jumped_pieces:
+                            jumped_pieces.append((jumped_piece_row, jumped_piece_column))
+                            possible_moves.append((start_cords, (checked_piece_row, checked_piece_column), jumped_pieces))
                         i += 1
+                    else:
+                        return possible_moves
             else:
                 return possible_moves
             i += 1
