@@ -97,12 +97,12 @@ class Board:
             self.board.append([])
             for col in range(COLS):
                 self.board[row].append(0)
-        queen = Piece(2, 7, color=WHITE)
+        queen = Piece(0, 1, color=WHITE)
         queen.queen = True
 
-        self.board[2][7] = queen
-        self.board[5][4] = Piece(5, 4, color=BROWN)
-        self.board[4][1] = Piece(4, 1, color=BROWN)
+        self.board[0][1] = queen
+        self.board[1][2] = Piece(1, 2, color=BROWN)
+        self.board[4][3] = Piece(4, 3, color=BROWN)
 
     def __update_queens(self, piece: Piece, row: int) -> None:
         if row == 0 and piece.color == WHITE:

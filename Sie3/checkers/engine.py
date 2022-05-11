@@ -11,13 +11,8 @@ class Engine:
         self.turn: Color = WHITE
         self.valid_moves: List = []
 
-    def check_winner(self) -> str:
-        winner: tuple = self.board.check_winner()
-        if winner == WHITE:
-            return "WHITE WON!"
-        if winner == BROWN:
-            return "BLACK WON!"
-        return None
+    def check_winner(self) -> Color:
+        return self.board.check_winner()
 
     def select_or_move_piece(self, row: int, col: int) -> None:
         # try to move if selected
@@ -35,6 +30,7 @@ class Engine:
         if not self.__is_piece_possible_to_select(self.selected, self.__get_all_moves_with_max_captures()):
             self.valid_moves = []
         else:
+            print(self.board.get_valid_moves_for_piece(piece, possible_moves=[]))
             self.valid_moves = self.board.get_valid_moves_for_piece(piece, possible_moves=[])
 
     def __move(self, selected_row: int, selected_col: int) -> bool:
