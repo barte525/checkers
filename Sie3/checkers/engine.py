@@ -1,4 +1,4 @@
-from .gui_const import WHITE, BROWN
+from .const import WHITE, BROWN
 from checkers.board import Board
 from checkers.piece import Piece
 from typing import List, Tuple

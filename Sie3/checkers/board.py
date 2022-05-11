@@ -1,4 +1,4 @@
-from .gui_const import ROWS, COLS, WHITE, BROWN
+from .const import ROWS, COLS, WHITE, BROWN
 from .piece import Piece
 import copy
 from typing import List, Tuple

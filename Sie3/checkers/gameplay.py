@@ -1,5 +1,5 @@
 import pygame
-from checkers.gui_const import WIDTH, HEIGHT, SQUARE_SIZE
+from checkers.const import WIDTH, HEIGHT, SQUARE
 from checkers.engine import Engine
 from checkers.gui import Gui
 
@@ -12,8 +12,8 @@ class GamePlay:
 
     def get_row_col_from_mouse(self, pos):
         x, y = pos
-        row = y // SQUARE_SIZE
-        col = x // SQUARE_SIZE
+        row = y // SQUARE
+        col = x // SQUARE
         return row, col
 
     def play(self):
