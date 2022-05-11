@@ -93,7 +93,7 @@ class Engine:
                 return True
         return False
 
-    def __change_turn(self):
+    def __change_turn(self) -> None:
         self.valid_moves: list = []
         if self.turn == WHITE:
             self.turn = BROWN
