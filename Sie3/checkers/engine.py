@@ -19,7 +19,7 @@ class Engine:
         if self.selected:
             if not self.__move(row, col):
                 self.selected = None
-                self.select_or_move_piece(row, col)
+            self.selected = None
         # select
         piece: Piece = self.board.get_piece_from_cords(row, col)
         if piece != 0 and piece.color == self.turn:
@@ -27,7 +27,7 @@ class Engine:
             self.__get_valid_moves_with_max_captures(piece)
 
     def __get_valid_moves_with_max_captures(self, piece: Piece) -> None:
-        if not self.__is_piece_possible_to_select(self.selected, self.__get_all_moves_with_max_captures()):
+        if not self.__is_piece_possible_to_select(self.selected, self.get_all_moves_with_max_captures()):
             self.valid_moves = []
         else:
             print(self.board.get_valid_moves_for_piece(piece, possible_moves=[]))
@@ -60,7 +60,7 @@ class Engine:
         row, col = destination_cords
         return row, col, jumped_pieces
 
-    def __get_all_moves_with_max_captures(self) -> List:
+    def get_all_moves_with_max_captures(self) -> List:
         max_captured_pieces: int = 0
         all_pieces: List[Piece] = self.board.get_all_pieces_of_color(self.turn)
         moves_with_max_captures: list = []
