@@ -1,5 +1,6 @@
 import pygame
-from .const import BLUE, SQUARE, CROWN, GREY, ROWS, COLS, BLACK, PADDING, CURSOR_SIZE
+from .const import BLUE, SQUARE, GREY, ROWS, COLS, BLACK, PADDING, CURSOR_SIZE
+# from .const import CROWN
 from typing import List
 from .board import List_of_moves, Board
 from .piece import Piece
@@ -29,9 +30,9 @@ class Gui:
         pieceSize: float = SQUARE // 2 - PADDING
         pygame.draw.circle(self.win, GREY, (piece.x, piece.y), pieceSize)
         pygame.draw.circle(self.win, piece.color, (piece.x, piece.y), pieceSize)
-        if piece.queen:
-            # in the middle of the square
-            self.win.blit(CROWN, (piece.x - CROWN.get_width()//2, piece.y - CROWN.get_height()//2))
+        # if piece.queen:
+        #     # in the middle of the square
+        #     self.win.blit(CROWN, (piece.x - CROWN.get_width()//2, piece.y - CROWN.get_height()//2))
 
     def __draw_squares(self) -> None:
         self.win.fill(BLACK)

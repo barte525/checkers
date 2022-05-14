@@ -42,18 +42,18 @@ class Board:
             self.__update_pieces(piece)
 
     def __create_board(self) -> None:
-        for row in range(ROWS):
-            self.board.append([])
-            for col in range(COLS):
-                if col % 2 == ((row + 1) % 2):
-                    if row < 3:
-                        self.board[row].append(Piece(row, col, BROWN))
-                    elif row > 4:
-                        self.board[row].append(Piece(row, col, WHITE))
-                    else:
-                        self.board[row].append(0)
-                else:
-                    self.board[row].append(0)
+        # for row in range(ROWS):
+        #     self.board.append([])
+        #     for col in range(COLS):
+        #         if col % 2 == ((row + 1) % 2):
+        #             if row < 3:
+        #                 self.board[row].append(Piece(row, col, BROWN))
+        #             elif row > 4:
+        #                 self.board[row].append(Piece(row, col, WHITE))
+        #             else:
+        #                 self.board[row].append(0)
+        #         else:
+        #             self.board[row].append(0)
 
         # for row in range(ROWS):
         #     self.board.append([])
@@ -103,14 +103,13 @@ class Board:
         # self.board[0][1] = queen
         # self.board[1][2] = Piece(1, 2, color=BROWN)
         # self.board[4][3] = Piece(4, 3, color=BROWN)
-        # for row in range(ROWS):
-        #     self.board.append([])
-        #     for col in range(COLS):
-        #         self.board[row].append(0)
-        # queen = Piece(0, 1, color=BROWN)
-        # queen.queen = True
-        #
-        # self.board[0][1] = queen
+        for row in range(ROWS):
+            self.board.append([])
+            for col in range(COLS):
+                self.board[row].append(0)
+        queen = Piece(6, 3, color=BROWN)
+
+        self.board[6][3] = queen
         # self.board[1][0] = Piece(1, 0, color=WHITE)
         # self.board[1][0].queen = True
 
