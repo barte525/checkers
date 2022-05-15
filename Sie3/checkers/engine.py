@@ -14,6 +14,9 @@ class Engine:
     def check_winner(self) -> Color:
         return self.board.check_winner()
 
+    def is_game_over(self):
+        return self.check_winner() and self.__check__for_valid_moves()
+
     def select_or_move_piece(self, row: int, col: int) -> None:
         # try to move if selected
         if self.selected:
@@ -24,14 +27,27 @@ class Engine:
         piece: Piece = self.board.get_piece_from_cords(row, col)
         if piece != 0 and piece.color == self.turn:
             self.selected = piece
-            self.__get_valid_moves_with_max_captures(piece)
+            self.update_valid_moves_with_max_captures(piece)
 
-    def __get_valid_moves_with_max_captures(self, piece: Piece) -> None:
-        if not self.__is_piece_possible_to_select(self.selected, self.get_all_moves_with_max_captures()):
+    def get_all_valid_moves(self, color: Color):
+        result = []
+        all_pieces: List[Piece] = self.board.get_all_pieces_of_color(color)
+        for piece in all_pieces:
+            result.append((piece, self.get_valid_moves_with_max_captures(piece, color)))
+        return result
+
+    def update_valid_moves_with_max_captures(self, piece: Piece) -> None:
+        if not self.__is_piece_possible_to_select(self.selected, self.get_all_moves_with_max_captures(self.turn)):
             self.valid_moves = []
         else:
             print(self.board.get_valid_moves_for_piece(piece, possible_moves=[]))
             self.valid_moves = self.board.get_valid_moves_for_piece(piece, possible_moves=[])
+
+    def get_valid_moves_with_max_captures(self, piece: Piece, color) -> List:
+        if not self.__is_piece_possible_to_select(piece, self.get_all_moves_with_max_captures(color)):
+            return []
+        else:
+            return self.board.get_valid_moves_for_piece(piece, possible_moves=[])
 
     def __move(self, selected_row: int, selected_col: int) -> bool:
         if self.selected is not None and self.board.is_square_free(selected_row, selected_col):
@@ -60,9 +76,9 @@ class Engine:
         row, col = destination_cords
         return row, col, jumped_pieces
 
-    def get_all_moves_with_max_captures(self) -> List:
+    def get_all_moves_with_max_captures(self, color) -> List:
         max_captured_pieces: int = 0
-        all_pieces: List[Piece] = self.board.get_all_pieces_of_color(self.turn)
+        all_pieces: List[Piece] = self.board.get_all_pieces_of_color(color)
         moves_with_max_captures: list = []
         for piece in all_pieces:
             valid_moves_for_piece: list = self.board.get_valid_moves_for_piece(piece, possible_moves=[])
@@ -87,6 +103,11 @@ class Engine:
         for possible_piece_to_select, _ in all_valid_moves:
             if possible_piece_to_select == piece:
                 return True
+        return False
+
+    def __check__for_valid_moves(self) -> bool:
+        if not self.get_all_moves_with_max_captures(WHITE) or not self.get_all_moves_with_max_captures(BROWN):
+            return True
         return False
 
     def __change_turn(self) -> None:

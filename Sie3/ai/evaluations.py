@@ -5,7 +5,7 @@ from checkers.piece import Piece
 
 
 class Evaluator:
-    queen_weight: float = 5
+    queen_weight: float = 6
     band_weight: float = 3
     close_to_band_weight: float = 2
     man_weight: float = 1
@@ -14,6 +14,7 @@ class Evaluator:
         self.board: Board = board
 
     def evaluate(self) -> float:
+        print(type(self.board))
         white: List[Piece] = self.board.get_all_pieces_of_color(WHITE)
         black: List[Piece] = self.board.get_all_pieces_of_color(BROWN)
         return Evaluator.__evaluate_one_site(white) - Evaluator.__evaluate_one_site(black)

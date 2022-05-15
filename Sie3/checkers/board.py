@@ -107,11 +107,12 @@ class Board:
             self.board.append([])
             for col in range(COLS):
                 self.board[row].append(0)
-        queen = Piece(6, 3, color=BROWN)
-
-        self.board[6][3] = queen
-        # self.board[1][0] = Piece(1, 0, color=WHITE)
-        # self.board[1][0].queen = True
+        piece = Piece(2, 5, WHITE)
+        self.board[2][5] = piece
+        piece = Piece(6, 1, WHITE)
+        self.board[6][1] = piece
+        piece = Piece(1, 2, BROWN)
+        self.board[1][2] = piece
 
     def __update_queens(self, piece: Piece, row: int) -> None:
         if row == 0 and piece.color == WHITE:
@@ -337,3 +338,35 @@ class Board:
             col += (1 if go_right else -1)
             result.append((row, col))
         return result
+
+    # def is_game_over(self):
+    #     return self.check_winner() is not None and self.__check__for_valid_moves
+    #
+    # def __check__for_valid_moves(self) -> bool:
+    #     if not self.__get_all_moves_with_max_captures(WHITE) or not self.__get_all_moves_with_max_captures(BROWN):
+    #         return True
+    #     return False
+    #
+    # def __get_all_moves_with_max_captures(self, color) -> List:
+    #     max_captured_pieces: int = 0
+    #     all_pieces: List[Piece] = self.get_all_pieces_of_color(color)
+    #     moves_with_max_captures: list = []
+    #     for piece in all_pieces:
+    #         valid_moves_for_piece: list = self.get_valid_moves_for_piece(piece, possible_moves=[])
+    #         if valid_moves_for_piece:
+    #             moves_with_max_captures, max_captured_pieces = self.__update_moves_with_max_captures(
+    #                 max_captured_pieces, moves_with_max_captures, piece, valid_moves_for_piece)
+    #     return moves_with_max_captures
+    #
+    # @staticmethod
+    # def __update_moves_with_max_captures(max_captured_pieces: int, moves_with_max_captures: list,
+    #                                      piece: Piece, valid_moves_for_piece: list) -> Tuple[List, int]:
+    #     number_of_captured_pieces: int = len(valid_moves_for_piece[0][2])
+    #     if number_of_captured_pieces > max_captured_pieces:
+    #         moves_with_max_captures: list = [(piece, valid_moves_for_piece)]
+    #         max_captured_pieces = number_of_captured_pieces
+    #     if number_of_captured_pieces == max_captured_pieces:
+    #         moves_with_max_captures.append((piece, valid_moves_for_piece))
+    #     return moves_with_max_captures, max_captured_pieces
+
+

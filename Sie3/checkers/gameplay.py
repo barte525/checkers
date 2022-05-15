@@ -57,7 +57,7 @@ class GamePlay:
 
     @staticmethod
     def __check__for_valid_moves(engine: Engine) -> bool:
-        if not engine.get_all_moves_with_max_captures():
+        if not engine.get_all_moves_with_max_captures(engine.turn):
             GamePlay.__announce_winner(engine.turn, True)
             return True
         return False
