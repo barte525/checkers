@@ -14,7 +14,6 @@ class Evaluator:
         self.board: Board = board
 
     def evaluate(self) -> float:
-        print(type(self.board))
         white: List[Piece] = self.board.get_all_pieces_of_color(WHITE)
         black: List[Piece] = self.board.get_all_pieces_of_color(BROWN)
         return Evaluator.__evaluate_one_site(white) - Evaluator.__evaluate_one_site(black)

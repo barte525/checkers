@@ -42,18 +42,18 @@ class Board:
             self.__update_pieces(piece)
 
     def __create_board(self) -> None:
-        # for row in range(ROWS):
-        #     self.board.append([])
-        #     for col in range(COLS):
-        #         if col % 2 == ((row + 1) % 2):
-        #             if row < 3:
-        #                 self.board[row].append(Piece(row, col, BROWN))
-        #             elif row > 4:
-        #                 self.board[row].append(Piece(row, col, WHITE))
-        #             else:
-        #                 self.board[row].append(0)
-        #         else:
-        #             self.board[row].append(0)
+        for row in range(ROWS):
+            self.board.append([])
+            for col in range(COLS):
+                if col % 2 == ((row + 1) % 2):
+                    if row < 3:
+                        self.board[row].append(Piece(row, col, BROWN))
+                    elif row > 4:
+                        self.board[row].append(Piece(row, col, WHITE))
+                    else:
+                        self.board[row].append(0)
+                else:
+                    self.board[row].append(0)
 
         # for row in range(ROWS):
         #     self.board.append([])
@@ -103,16 +103,16 @@ class Board:
         # self.board[0][1] = queen
         # self.board[1][2] = Piece(1, 2, color=BROWN)
         # self.board[4][3] = Piece(4, 3, color=BROWN)
-        for row in range(ROWS):
-            self.board.append([])
-            for col in range(COLS):
-                self.board[row].append(0)
-        piece = Piece(2, 5, WHITE)
-        self.board[2][5] = piece
-        piece = Piece(6, 1, WHITE)
-        self.board[6][1] = piece
-        piece = Piece(1, 2, BROWN)
-        self.board[1][2] = piece
+        # for row in range(ROWS):
+        #     self.board.append([])
+        #     for col in range(COLS):
+        #         self.board[row].append(0)
+        # piece = Piece(2, 5, WHITE)
+        # self.board[2][5] = piece
+        # piece = Piece(6, 1, WHITE)
+        # self.board[6][1] = piece
+        # piece = Piece(1, 2, BROWN)
+        # self.board[1][2] = piece
 
     def __update_queens(self, piece: Piece, row: int) -> None:
         if row == 0 and piece.color == WHITE:

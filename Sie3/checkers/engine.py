@@ -17,6 +17,10 @@ class Engine:
     def is_game_over(self):
         return self.check_winner() and self.__check__for_valid_moves()
 
+    def ai_move(self, board: Board):
+        self.board = board
+        self.__change_turn()
+
     def select_or_move_piece(self, row: int, col: int) -> None:
         # try to move if selected
         if self.selected:

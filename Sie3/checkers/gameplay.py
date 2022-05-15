@@ -4,7 +4,7 @@ from checkers.engine import Engine
 from checkers.gui import Gui
 from typing import Tuple
 from .board import Board
-
+from ai.mini_max import minimax
 
 class GamePlay:
     def __init__(self):
@@ -18,7 +18,7 @@ class GamePlay:
         col: int = pos[0] // SQUARE
         return row, col
 
-    def play(self) -> None:
+    def play(self, ai: bool) -> None:
         clock = pygame.time.Clock()
         engine: Engine = Engine()
         gui: Gui = Gui(self.win, engine.board)
@@ -26,6 +26,9 @@ class GamePlay:
         tie_iterator: int = 0
         while run:
             clock.tick(self.FPS)
+            if ai and engine.turn == BROWN:
+                _, new_board = minimax(engine, False)
+                engine.ai_move(new_board.board)
             if engine.check_winner():
                 GamePlay.__announce_winner(engine.check_winner())
                 run = False
@@ -39,7 +42,6 @@ class GamePlay:
                     if GamePlay.__check__for_valid_moves(engine):
                         run = False
                     tie_iterator += GamePlay.__is_all_queen(engine.board)
-                    print(tie_iterator)
                     if tie_iterator >= 30:
                         GamePlay.__announce_winner(None)
                         run = False

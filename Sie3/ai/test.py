@@ -75,6 +75,8 @@ def test_minimax_depth_2():
     engine.board.board[6][1] = piece
     piece = Piece(1, 2, BROWN)
     engine.board.board[1][2] = piece
+    score, move = minimax(engine, True, 1)
+    assert move.board.board[5][0] != 0
     score, move = minimax(engine, True, 3)
     assert move.board.board[1][4] != 0 or move.board.board[1][6] != 0
 

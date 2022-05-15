@@ -1,6 +1,5 @@
 from .evaluations import Evaluator
 from checkers.engine import Engine
-from checkers.board import Move
 from typing import Tuple, List
 import copy
 from checkers.const import WHITE, BROWN
@@ -32,9 +31,7 @@ def minimax(position: Engine, maximize: bool, depth: int = 4) -> Tuple[int, Engi
 def get_boards_for_each_move(game: Engine, is_white: bool) -> List[Engine]:
     boards = []
     color = WHITE if is_white else BROWN
-    print(color)
     all_moves = game.get_all_valid_moves(color)
-    print(all_moves)
 
     for piece, moves in all_moves:
         for move in moves:
