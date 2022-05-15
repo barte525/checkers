@@ -4,7 +4,8 @@ from checkers.engine import Engine
 from checkers.gui import Gui
 from typing import Tuple
 from .board import Board
-from ai.mini_max import minimax
+from ai.algorithms import minimax
+import time
 
 
 class GamePlay:
@@ -28,10 +29,13 @@ class GamePlay:
         while run:
             clock.tick(self.FPS)
             if ai and engine.turn == BROWN:
-                _, new_board = minimax(engine, False)
+                _, new_board = minimax(engine, False, alpha_beta=True)
                 engine.ai_move(new_board.board)
             if double_ai and engine.turn == WHITE:
-                _, new_board = minimax(engine, True)
+                start = time.time()
+                _, new_board = minimax(engine, True, alpha_beta=True)
+                end = time.time()
+                print(end - start)
                 engine.ai_move(new_board.board)
             if engine.check_winner():
                 GamePlay.__announce_winner(engine.check_winner())
