@@ -15,4 +15,4 @@ BLUE: Color = (0, 0, 255)
 GREY: Color = (128, 128, 128)
 BROWN: Color = (110, 64, 48)
 
-CROWN: pygame.Surface = pygame.transform.scale(pygame.image.load('checkers/crown.png'), (50, 50))
+# CROWN: pygame.Surface = pygame.transform.scale(pygame.image.load('checkers/crown.png'), (50, 50))

@@ -6,6 +6,7 @@ from typing import Tuple
 from .board import Board
 from ai.mini_max import minimax
 
+
 class GamePlay:
     def __init__(self):
         self.FPS: int = 60
@@ -18,7 +19,7 @@ class GamePlay:
         col: int = pos[0] // SQUARE
         return row, col
 
-    def play(self, ai: bool) -> None:
+    def play(self, ai: bool, double_ai) -> None:
         clock = pygame.time.Clock()
         engine: Engine = Engine()
         gui: Gui = Gui(self.win, engine.board)
@@ -28,6 +29,9 @@ class GamePlay:
             clock.tick(self.FPS)
             if ai and engine.turn == BROWN:
                 _, new_board = minimax(engine, False)
+                engine.ai_move(new_board.board)
+            if double_ai and engine.turn == WHITE:
+                _, new_board = minimax(engine, True)
                 engine.ai_move(new_board.board)
             if engine.check_winner():
                 GamePlay.__announce_winner(engine.check_winner())
