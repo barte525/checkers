@@ -21,7 +21,8 @@ class GamePlay:
         col: int = pos[0] // SQUARE
         return row, col
 
-    def play(self, ai: bool, double_ai: bool, random_first_move: bool, alpha_beta: bool = False) -> Optional[Tuple[float, float]]:
+    def play(self, ai: bool, double_ai: bool, random_first_move: bool, alpha_beta: bool = False, white_depth: int = 4,
+             black_depth: int = 4) -> Optional[Tuple[float, float]]:
         clock = pygame.time.Clock()
         engine: Engine = Engine()
         gui: Gui = Gui(self.win, engine.board)
@@ -40,7 +41,7 @@ class GamePlay:
                 first_moves_done += 1
             elif ai and engine.turn == BROWN:
                 start = time.time()
-                _, new_board = minimax(engine, False, alpha_beta=alpha_beta, depth=2)
+                _, new_board = minimax(engine, False, alpha_beta=alpha_beta, depth=black_depth)
                 end = time.time()
                 tie_iterator += 1
                 black_time += (end-start)
@@ -48,7 +49,7 @@ class GamePlay:
                 engine.ai_move(new_board.board)
             elif double_ai and engine.turn == WHITE:
                 start = time.time()
-                _, new_board = minimax(engine, True, alpha_beta=alpha_beta, depth=5)
+                _, new_board = minimax(engine, True, alpha_beta=alpha_beta, depth=white_depth)
                 end = time.time()
                 tie_iterator += 1
                 white_time += (end-start)
