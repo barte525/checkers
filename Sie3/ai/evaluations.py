@@ -5,9 +5,10 @@ from checkers.piece import Piece
 
 
 class Evaluator:
-    queen_weight: float = 6
-    band_weight: float = 3
-    close_to_band_weight: float = 2
+    first_queen: float = 10
+    second_queen: float = 3
+    band_weight: float = 1.8
+    close_to_band_weight: float = 1.5
     man_weight: float = 1
 
     def __init__(self, board: Board):
@@ -16,15 +17,15 @@ class Evaluator:
     def evaluate(self) -> float:
         white: List[Piece] = self.board.get_all_pieces_of_color(WHITE)
         black: List[Piece] = self.board.get_all_pieces_of_color(BROWN)
-        return Evaluator.__evaluate_one_site(white) - Evaluator.__evaluate_one_site(black)
+        return self.__evaluate_one_site(white, "white") - self.__evaluate_one_site(black, "black")
 
-
-    @staticmethod
-    def __evaluate_one_site(pieces: List[Piece]) -> float:
+    def __evaluate_one_site(self, pieces: List[Piece], color: str) -> float:
         result: float = 0
         for piece in pieces:
-            if piece.queen:
-                result += Evaluator.queen_weight
+            if piece.queen and getattr(self.board, color+"_queens") != 0:
+                result += Evaluator.first_queen
+            elif piece.queen:
+                result += Evaluator.second_queen
             elif piece.col == 0 or piece.col == COLS - 1:
                 result += Evaluator.band_weight
             elif Evaluator.__is_piece_close_to_band(piece):
@@ -35,5 +36,6 @@ class Evaluator:
 
     @staticmethod
     def __is_piece_close_to_band(piece: Piece):
-        return piece.col == 1 or piece.col == COLS - 2 or (piece.color == BROWN and piece.row == 1) or\
-               (piece.color == WHITE and piece.row == ROWS - 2)
+        return piece.col == 1 or piece.col == COLS - 2 or (piece.color == BROWN and piece.row == ROWS-2) or\
+               (piece.color == WHITE and piece.row == 1) or (piece.color == BROWN and piece.row == 0) or\
+               (piece.color == WHITE and piece.row == ROWS-1)

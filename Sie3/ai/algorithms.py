@@ -20,7 +20,10 @@ def __minimax(position: Engine, maximize: bool, depth: int, alpha: float = None,
     if maximize:
         max_eval: float = float("-inf")
         position_after_best_move = None
-        for moved_board in get_boards_for_each_move(position, maximize):
+        moved_boards = get_boards_for_each_move(position, maximize)
+        if not moved_boards:
+            return Evaluator(position.board).evaluate(), position
+        for moved_board in moved_boards:
             if not alpha:
                 eval: float = __minimax(moved_board, False, depth - 1)[0]
             else:
@@ -36,7 +39,10 @@ def __minimax(position: Engine, maximize: bool, depth: int, alpha: float = None,
     else:
         min_score = float('inf')
         position_after_best_move = None
-        for moved_board in get_boards_for_each_move(position, maximize):
+        moved_boards = get_boards_for_each_move(position, maximize)
+        if not moved_boards:
+            return Evaluator(position.board).evaluate(), position
+        for moved_board in moved_boards:
             if not alpha:
                 eval: float = __minimax(moved_board, True, depth - 1)[0]
             else:
@@ -61,7 +67,8 @@ def get_boards_for_each_move(game: Engine, is_white: bool) -> List[Engine]:
             _, future_cords, captured_pieces = move
             new_board: Engine = copy.deepcopy(game)
             moved_piece: Piece = new_board.board.get_piece_from_cords(piece.row, piece.col)
-            new_board.board.move(moved_piece, future_cords[0], future_cords[1])
+            if moved_piece != 0:
+                new_board.board.move(moved_piece, future_cords[0], future_cords[1])
             for captured_piece_row, captured_piece_column in captured_pieces:
                 jumped_piece: Piece = new_board.board.get_piece_from_cords(captured_piece_row, captured_piece_column)
                 new_board.board.remove(jumped_piece)

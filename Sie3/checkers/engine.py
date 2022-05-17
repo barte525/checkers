@@ -1,5 +1,5 @@
 from .const import WHITE, BROWN, Color
-from checkers.board import Board
+from checkers.board import Board, Move
 from checkers.piece import Piece
 from typing import List, Tuple
 
@@ -44,7 +44,6 @@ class Engine:
         if not self.__is_piece_possible_to_select(self.selected, self.get_all_moves_with_max_captures(self.turn)):
             self.valid_moves = []
         else:
-            print(self.board.get_valid_moves_for_piece(piece, possible_moves=[]))
             self.valid_moves = self.board.get_valid_moves_for_piece(piece, possible_moves=[])
 
     def get_valid_moves_with_max_captures(self, piece: Piece, color) -> List:
@@ -52,6 +51,12 @@ class Engine:
             return []
         else:
             return self.board.get_valid_moves_for_piece(piece, possible_moves=[])
+
+    def ai_special_move(self, piece: Piece, move: Move) -> None:
+        row, col, captured_pieces = self.__unpack_move(move)
+        self.__remove_captured_pieces(captured_pieces)
+        self.board.move(piece, row, col)
+        self.__change_turn()
 
     def __move(self, selected_row: int, selected_col: int) -> bool:
         if self.selected is not None and self.board.is_square_free(selected_row, selected_col):
@@ -110,7 +115,7 @@ class Engine:
         return False
 
     def __check__for_valid_moves(self) -> bool:
-        if not self.get_all_moves_with_max_captures(WHITE) or not self.get_all_moves_with_max_captures(BROWN):
+        if not self.get_all_valid_moves(WHITE) or not self.get_all_valid_moves(BROWN):
             return True
         return False
 
