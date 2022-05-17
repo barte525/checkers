@@ -24,4 +24,5 @@ def simulation(number_of_white_wins: int, ai: bool, double_ai: bool, random_firs
 
 
 if __name__ == '__main__':
-    simulation(3, True, True, True, True, 5, 2)
+    simulation(number_of_white_wins=3, ai=True, double_ai=False, random_first_move=False, alpha_beta=True, white_depth=4,
+               black_depth=2)
